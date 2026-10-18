@@ -1,4 +1,4 @@
-/// Track events and logs from Dart and Flutter with simpledatalogs.
+/// Track events and errors from Dart and Flutter with simpledatalogs.
 ///
 /// Start with `SimpleDataLogs.configure`, then call `SimpleDataLogs.track`.
 library;

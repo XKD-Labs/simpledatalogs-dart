@@ -1,5 +1,5 @@
 name: simpledatalogs
-description: Track events and logs from Dart and Flutter apps and servers with simpledatalogs. A crash-safe outbox, batching, retries with backoff, and no lost or double-counted events.
+description: Track events and errors from Dart and Flutter apps and servers with simpledatalogs. A crash-safe outbox, batching, retries with backoff, and no lost or double-counted events.
 version: 0.1.0
 homepage: https://simpledatalogs.com
 repository: https://github.com/XKD-Labs/simpledatalogs-dart
