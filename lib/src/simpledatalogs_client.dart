@@ -95,6 +95,9 @@ class SimpleDataLogsClient {
   /// The wake-up for the next batch seal or retry.
   Timer? _wakeTimer;
 
+  /// The zone this client was created in; every internal future and timer runs there, whatever zone the caller is in.
+  final Zone _clientZone = Zone.current;
+
   /// False after an opt-out: events are ignored and the outbox is deleted.
   bool _isEnabled;
 
@@ -474,7 +477,7 @@ class SimpleDataLogsClient {
       return runningLoop;
     }
 
-    final newLoop = _sendEligibleBatches().whenComplete(() {
+    final newLoop = _clientZone.run(_sendEligibleBatches).whenComplete(() {
       _sendLoop = null;
       _enqueue(() async => _scheduleWake());
     });
@@ -647,13 +650,16 @@ class SimpleDataLogsClient {
   Future<T?> _enqueue<T>(Future<T> Function() operation) {
     final operationResult = Completer<T?>();
 
-    _operationChainTail = _operationChainTail.then((_) async {
-      try {
-        operationResult.complete(await operation());
-      } catch (operationError) {
-        SdkLog.warning('Outbox operation failed: $operationError');
-        operationResult.complete(null);
-      }
+    // Chain in the client's own zone, so a caller's test or guarded zone never holds the work back.
+    _clientZone.run(() {
+      _operationChainTail = _operationChainTail.then((_) async {
+        try {
+          operationResult.complete(await operation());
+        } catch (operationError) {
+          SdkLog.warning('Outbox operation failed: $operationError');
+          operationResult.complete(null);
+        }
+      });
     });
 
     return operationResult.future;

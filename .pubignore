@@ -1,0 +1,4 @@
+# The Flutter companion is published as its own package.
+flutter/
+.github/
+docs/
