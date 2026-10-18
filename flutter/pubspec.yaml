@@ -1,0 +1,28 @@
+name: simpledatalogs_flutter
+description: Flutter wiring for simpledatalogs. A disk outbox in the app support folder, flushes on background, sessions, error capture and screen views from a NavigatorObserver.
+version: 0.1.0
+homepage: https://simpledatalogs.com
+repository: https://github.com/XKD-Labs/simpledatalogs-dart/tree/main/flutter
+issue_tracker: https://github.com/XKD-Labs/simpledatalogs-dart/issues
+documentation: https://simpledatalogs.com/docs
+topics:
+  - analytics
+  - logging
+  - events
+  - telemetry
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  path_provider: ^2.1.0
+  simpledatalogs: ^0.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lints: ^5.0.0

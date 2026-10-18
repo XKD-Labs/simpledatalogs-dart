@@ -1,0 +1,4 @@
+# Develops against the core in this repository; the publish workflow deletes this file first.
+dependency_overrides:
+  simpledatalogs:
+    path: ..
