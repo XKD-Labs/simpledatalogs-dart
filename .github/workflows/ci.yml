@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # The pure Dart core on the oldest and newest supported SDKs.
+  dart:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk: ["3.5.4", "3.9.4"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+      - run: dart pub get
+      - run: dart format --output none --set-exit-if-changed .
+        if: matrix.sdk == '3.9.4'
+      - run: dart analyze --fatal-infos
+      - run: dart test
+      - run: dart compile js -o /tmp/web_compile_check.js tool/web_compile_check.dart
+      - run: dart pub publish --dry-run
+
+  # The Flutter companion against the core in this repository.
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.6"
+          channel: stable
+      - run: flutter pub get
+      - run: dart format --output none --set-exit-if-changed .
+      - run: flutter analyze
+      - run: flutter test
