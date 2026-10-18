@@ -37,4 +37,5 @@ The tests start a real local HTTP server as a fake ingest endpoint, so they neve
 Maintainers only. Releases publish to pub.dev from GitHub Actions with OIDC, so no token is stored anywhere.
 
 1. Update `version` in `pubspec.yaml` (and `flutter/pubspec.yaml`), `lib/src/version.dart` and both changelogs.
-2. Tag the core `vX.Y.Z` and the Flutter package `flutter-vX.Y.Z`, then push the tags.
+2. Tag and push the core `vX.Y.Z` first, since the Flutter package resolves the core from pub.dev.
+3. Then tag and push the Flutter package `flutter-vX.Y.Z`.
