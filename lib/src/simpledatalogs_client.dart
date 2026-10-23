@@ -13,6 +13,10 @@ import 'session_tracker.dart';
 import 'tracked_event.dart';
 import 'version.dart';
 
+/// How long a partial batch waits: 5 s in debug and profile builds, so new events show within seconds; 10 s in release.
+const Duration defaultBatchInterval =
+    bool.fromEnvironment('dart.vm.product') ? Duration(seconds: 10) : Duration(seconds: 5);
+
 /// Tunables tests shrink; every default follows the ingest API.
 class PipelineTuning {
   /// Batch and total size limits.
@@ -62,7 +66,7 @@ class SimpleDataLogsClient {
   /// The most `app_error` events in one run.
   static const int maxErrorsPerRun = 50;
 
-  /// Seal and send a partial batch this long after its first event (apps 30 s, servers ~5 s).
+  /// Seal and send a partial batch this long after its first event (10 s in release, 5 s otherwise; servers ~5 s).
   final Duration batchInterval;
 
   /// What autocapture sends.
@@ -137,7 +141,7 @@ class SimpleDataLogsClient {
     Uri? endpoint,
     OutboxStorage? storage,
     this.autocapture = AutocaptureOptions.none,
-    this.batchInterval = const Duration(seconds: 30),
+    this.batchInterval = defaultBatchInterval,
     bool isEnabled = true,
     String? deviceId,
     Map<String, Object?> defaultProperties = const {},

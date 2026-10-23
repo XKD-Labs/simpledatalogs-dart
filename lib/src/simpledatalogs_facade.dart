@@ -38,7 +38,7 @@ abstract final class SimpleDataLogs {
     Uri? endpoint,
     AutocaptureOptions autocapture = AutocaptureOptions.none,
     OutboxStorage? storage,
-    Duration batchInterval = const Duration(seconds: 30),
+    Duration batchInterval = defaultBatchInterval,
     http.Client? httpClient,
   }) {
     // The first configuration stays in effect.

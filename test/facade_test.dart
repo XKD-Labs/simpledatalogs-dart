@@ -6,6 +6,10 @@ import 'package:test/test.dart';
 void main() {
   tearDown(SimpleDataLogs.close);
 
+  test('a partial batch waits 5 s outside release builds', () {
+    expect(defaultBatchInterval, const Duration(seconds: 5));
+  });
+
   test('the facade drops events tracked before configure, then sends the rest', () async {
     final sentBodies = <String>[];
     final mockClient = MockClient((request) async {

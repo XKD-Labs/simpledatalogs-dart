@@ -83,7 +83,7 @@ To send to another ingest endpoint, such as a local one, pass `endpoint: Uri.par
 | Call | What it does |
 |---|---|
 | `SimpleDataLogsFlutter.configure(ingestKey:, endpoint:, autocapture:)` | Flutter: starts the SDK with a disk outbox and lifecycle flushes. Later calls are ignored. |
-| `SimpleDataLogs.configure(ingestKey:, endpoint:, autocapture:, storage:, batchInterval:)` | Pure Dart: starts the SDK once. `storage` defaults to memory; pass `FileOutboxStorage` to survive restarts. `batchInterval` defaults to 30 s (use ~5 s on servers). |
+| `SimpleDataLogs.configure(ingestKey:, endpoint:, autocapture:, storage:, batchInterval:)` | Pure Dart: starts the SDK once. `storage` defaults to memory; pass `FileOutboxStorage` to survive restarts. `batchInterval` defaults to 10 s in release builds and 5 s in debug (use ~5 s on servers). |
 | `track(eventName, [properties])` | Records one event. `event_id` and `ts` are stamped now, when the event happens. |
 | `trackScreen(screenName, [properties])` | Records `screen_view` with a `screen` prop. |
 | `trackError(error, [stackTrace, properties])` | Records `app_error` (`exception_type`, `message`, `stack`), at most 5 per message and 50 per run. |
@@ -131,7 +131,7 @@ SimpleDataLogs.track('signup', {'plan': 'pro'});
 
 ## How it behaves
 
-- **Batching.** Events go out in batches of 50, or 30 s after the first event of a partial batch (configurable). Every request body is under 256 KB; bodies of 1 KB or more are gzipped (not on the web).
+- **Batching.** Events go out in batches of 50, or after the first event of a partial batch has waited 10 s in release, 5 s in debug (configurable). Every request body is under 256 KB; bodies of 1 KB or more are gzipped (not on the web).
 - **Crash-safe outbox.** Each event is appended to a journal as it is tracked.
   - Batches are sealed into files and deleted only after a `202`.
   - The next run resends anything left over, including a journal cut short by a crash.

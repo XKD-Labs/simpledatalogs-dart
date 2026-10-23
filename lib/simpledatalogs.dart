@@ -6,5 +6,5 @@ library;
 export 'src/outbox_storage.dart' show OutboxStorage, MemoryOutboxStorage;
 export 'src/sdk_log.dart' show SdkLog, SdkLogLevel, SdkLogHandler;
 export 'src/session_tracker.dart' show AutocaptureOptions;
-export 'src/simpledatalogs_client.dart' show SimpleDataLogsClient;
+export 'src/simpledatalogs_client.dart' show SimpleDataLogsClient, defaultBatchInterval;
 export 'src/simpledatalogs_facade.dart' show SimpleDataLogs;

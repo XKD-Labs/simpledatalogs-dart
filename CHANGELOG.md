@@ -9,6 +9,7 @@ The first public release.
 ### Added
 
 - `SimpleDataLogs.configure`, `track`, `trackScreen`, `trackError`, `setDeviceId`, `setDefaultProperties`, `setEnabled`, `flush` and `close`, plus `SimpleDataLogsClient` for several keys in one process.
+- A partial batch goes out 10 s after its first event in release builds and 5 s in debug and profile, so new events show within seconds.
 - A crash-safe outbox (`FileOutboxStorage` on the VM and Flutter, memory elsewhere) with batching, gzip, retries with jittered backoff, `Retry-After`, 401 pauses, 413 splitting and 415 set-asides.
 - Bounded storage: at most 10,000 events, 10 MB or 500 batch files.
 - Opt-in autocapture of launches, sessions and errors.
