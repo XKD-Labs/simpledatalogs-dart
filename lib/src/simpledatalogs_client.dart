@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:http/http.dart' as http;
 
+import 'activity_tracker.dart';
 import 'event_outbox.dart';
 import 'ingest_client.dart';
 import 'outbox_storage.dart';
@@ -14,8 +15,7 @@ import 'tracked_event.dart';
 import 'version.dart';
 
 /// How long a partial batch waits: 5 s in debug and profile builds, so new events show within seconds; 10 s in release.
-const Duration defaultBatchInterval =
-    bool.fromEnvironment('dart.vm.product') ? Duration(seconds: 10) : Duration(seconds: 5);
+const Duration defaultBatchInterval = bool.fromEnvironment('dart.vm.product') ? Duration(seconds: 10) : Duration(seconds: 5);
 
 /// Tunables tests shrink; every default follows the ingest API.
 class PipelineTuning {
@@ -114,6 +114,9 @@ class SimpleDataLogsClient {
   /// Properties merged into every event's props.
   Map<String, Object> _defaultProperties = {};
 
+  /// The app's foreground time between events, once the Flutter companion reports the app's state.
+  ActivityTracker? _activityTracker;
+
   /// Track calls queued and not yet journaled.
   int _pendingTrackCount = 0;
 
@@ -178,7 +181,11 @@ class SimpleDataLogsClient {
 
   /// Records one event; it returns at once and never throws.
   void track(String eventName, [Map<String, Object?> properties = const {}]) {
-    _trackAt(eventName, properties, _tuning.now());
+    final occurredAt = _tuning.now();
+
+    // An event happening now says whether someone was using the app; the caller's own props win.
+    final activityProperties = _activityTracker?.stamp(occurredAt) ?? const {};
+    _trackAt(eventName, {...activityProperties, ...properties}, occurredAt);
   }
 
   /// Records a screen view (`screen_view` with a `screen` prop).
@@ -254,6 +261,18 @@ class SimpleDataLogsClient {
       await _runSendLoop();
     } catch (flushError) {
       SdkLog.warning('Flush failed: $flushError');
+    }
+  }
+
+  /// The app came to the front or left it; the first call turns on `app_state` and `engaged_ms`; the Flutter companion calls this.
+  void setAppActive(bool isActive) {
+    final now = _tuning.now();
+    final runningTracker = _activityTracker;
+
+    if (runningTracker == null) {
+      _activityTracker = ActivityTracker(isActive: isActive, at: now);
+    } else {
+      runningTracker.setActive(isActive, now);
     }
   }
 

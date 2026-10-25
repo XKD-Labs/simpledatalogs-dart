@@ -113,6 +113,15 @@ Off until you pass it.
 - **Screen views:** add `SimpleDataLogsNavigatorObserver()` to `navigatorObservers`. Named page routes send `screen_view` on push, replace and pop; pass `screenNameExtractor` to name them your own way.
 - **Pure Dart:** sessions follow `client.appBecameActive()` and `client.appWentToBackground()`, which the Flutter package calls for you.
 
+## Active and background
+
+With `SimpleDataLogsFlutter.configure`, every event tracked now says whether someone was using the app, so the Sessions tab can tell active sessions from passive ones:
+
+- `app_state` is `active` while the app is on screen, else `background`.
+- `engaged_ms` is the time the app spent on screen since the previous event.
+- Mark background work yourself with `SimpleDataLogs.track('sync_finished', {'app_state': 'background'})`; your value wins.
+- Turn it off with `reportsActivity: false`. Plain Dart (servers, scripts) sends neither.
+
 ## Events for games and apps
 
 ```dart

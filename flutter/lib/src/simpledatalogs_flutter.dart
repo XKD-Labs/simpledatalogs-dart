@@ -21,6 +21,7 @@ abstract final class SimpleDataLogsFlutter {
     Uri? endpoint,
     AutocaptureOptions autocapture = AutocaptureOptions.none,
     http.Client? httpClient,
+    bool reportsActivity = true,
   }) async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
@@ -37,10 +38,21 @@ abstract final class SimpleDataLogsFlutter {
         httpClient: httpClient,
       );
 
-      // Flush when the app is hidden, and keep sessions in step with the foreground.
+      // Events say whether someone was using the app; before the first frame, a launch counts as in front.
+      if (reportsActivity) {
+        SimpleDataLogs.client?.setAppActive(_isInFront(WidgetsBinding.instance.lifecycleState));
+      }
+
+      // Flush when the app is hidden, and keep sessions and app_state in step with the foreground.
       _lifecycleListener ??= AppLifecycleListener(
-        onShow: () => SimpleDataLogs.client?.appBecameActive(),
-        onHide: () => unawaited(SimpleDataLogs.client?.appWentToBackground()),
+        onShow: () {
+          if (reportsActivity) SimpleDataLogs.client?.setAppActive(true);
+          SimpleDataLogs.client?.appBecameActive();
+        },
+        onHide: () {
+          if (reportsActivity) SimpleDataLogs.client?.setAppActive(false);
+          unawaited(SimpleDataLogs.client?.appWentToBackground());
+        },
       );
 
       // Uncaught Flutter and platform errors, on request.
@@ -50,6 +62,11 @@ abstract final class SimpleDataLogsFlutter {
     } catch (configureError) {
       SdkLog.error('SimpleDataLogsFlutter.configure failed: $configureError');
     }
+  }
+
+  // Whether a lifecycle state means the app is on screen; no state yet means it is launching in front.
+  static bool _isInFront(AppLifecycleState? lifecycleState) {
+    return lifecycleState == null || lifecycleState == AppLifecycleState.resumed || lifecycleState == AppLifecycleState.inactive;
   }
 
   // The platform's outbox storage, or memory when the platform folder is unavailable.
