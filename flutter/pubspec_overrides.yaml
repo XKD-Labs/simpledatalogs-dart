@@ -1,4 +1,4 @@
-# Develops against the core in this repository; the publish workflow deletes this file first.
+# Develops against the core in this repository; move it aside before `flutter pub publish` (CONTRIBUTING.md).
 dependency_overrides:
   simpledatalogs:
     path: ..

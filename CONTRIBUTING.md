@@ -34,8 +34,8 @@ The tests start a real local HTTP server as a fake ingest endpoint, so they neve
 
 ## Releasing
 
-Maintainers only. Releases publish to pub.dev from GitHub Actions with OIDC, so no token is stored anywhere.
+Maintainers only, from their own machine (`dart pub login` once); nothing runs on GitHub.
 
 1. Update `version` in `pubspec.yaml` (and `flutter/pubspec.yaml`), `lib/src/version.dart` and both changelogs.
-2. Tag and push the core `vX.Y.Z` first, since the Flutter package resolves the core from pub.dev.
-3. Then tag and push the Flutter package `flutter-vX.Y.Z`.
+2. Run the tests above, then publish the core first, since the Flutter package resolves it from pub.dev: `dart pub publish` at the root. Tag `vX.Y.Z` and push.
+3. Then the Flutter package, without the local override: in `flutter/`, move `pubspec_overrides.yaml` aside, run `flutter pub get && flutter test && flutter pub publish`, put the file back, tag `flutter-vX.Y.Z` and push.
